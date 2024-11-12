@@ -1,49 +1,79 @@
 # TNA-TSA-Anomaly-2024 
-Monitoring Sea Surface Temperature (SST) in the Atlantic is vital for predicting Brazil's rainfall, as it affects the Intertropical Convergence Zone (ITCZ) and moisture distribution. SST anomalies influence precipitation patterns, making their tracking essential for accurate climate forecasts.
 
-This Python code analyzes sea surface temperature (SST) anomaly data from a NetCDF file provided by NOAA.  Here's a breakdown:
+Monitoring Sea Surface Temperature (SST) anomalies in the Atlantic is crucial for predicting rainfall in Brazil, given its influence on the Intertropical Convergence Zone (ITCZ) and moisture distribution. SST anomalies play a significant role in shaping precipitation patterns, making their tracking essential for accurate climate forecasts.
 
-**1. Data Acquisition:**
+The following Python code analyzes SST anomaly data obtained from a NetCDF file provided by NOAA. Below is a structured breakdown of the key components of the code:
 
-- The code first defines a function `download_data` to download the NetCDF file from a specified URL if it doesn't already exist in the `/content/` directory of the Google Colab environment.
-- It uses `wget` for downloading.
+## **1. Data Acquisition**
 
-**2. Data Loading and Preprocessing:**
+The NOAA provides daily SST anomalies accessible at: [NOAA OISST](https://psl.noaa.gov/data/gridded/data.noaa.oisst.v2.highres.html).
 
-- The `load_netcdf_data` function reads the NetCDF file using the `netCDF4` library.
-- It extracts SST anomalies, latitudes, longitudes, and time data.  Crucially, it converts the time variable from numerical values to datetime objects using `nc.num2date`.
-- It defines latitude and longitude ranges for two regions of interest: TNA (Tropical North Atlantic) and TSA (Tropical South Atlantic).
+### Key Information:
+- **Climatology**: Anomalies are calculated relative to a climatological baseline from 1971 to 2000.
+- **Temporal Coverage**:
+  - Daily values: September 1981 - September 2024
+  - Weekly values: September 1981 - September 2024
+  - Monthly values: September 1981 - September 2024
+  - Long-term monthly average (1991-2020)
+- **Spatial Coverage**: Covers a global grid with 0.25 degrees latitude x 0.25 degrees longitude (1440 x 720 points).
+- **Limits**: Ranges from 89.875°S to 89.875°N, and 0.125°E to 359.875°E.
+- **Update Frequency**: Daily
+- **File Format and Size**: Compliant with CF metadata standard in NetCDF4 format.
 
-**3. Regional Mean SST Calculation:**
+### Data Download Function:
+- The `download_data` function uses `wget` to download the NetCDF file from a specified URL if it’s not already present in the `/content/` directory of the Google Colab environment.
 
-- The `mean_sst_in_region` function calculates the mean SST anomaly within a specified region (defined by latitude and longitude ranges).  It applies masks to the latitude and longitude arrays to select the relevant data.
+## **2. Data Loading and Preprocessing**
 
-**4. Time Series Plotting:**
+- The `load_netcdf_data` function reads the NetCDF file utilizing the `netCDF4` library.
+- It extracts valuable attributes including:
+  - SST anomalies,
+  - Latitude and longitude data,
+  - Time data, converting numerical values to datetime objects using `nc.num2date`.
+- Latitude and longitude ranges are defined for two focal regions: TNA (Tropical North Atlantic) and TSA (Tropical South Atlantic).
 
-- The `plot_sst_difference` function generates plots showing the difference in mean SST anomalies between TNA and TSA.
-- Two plots are generated: One for the last 30 days and another for the entire year present in the data.
-- The plots show the difference in anomalies, as well as individual anomaly time series for TNA and TSA.
-- The x-axis is formatted to show dates clearly.  The plots include a horizontal line at 0 for reference, a legend, gridlines, and source/climatology information.
+## **3. Regional Mean SST Calculation**
 
-**5. Anomaly Variation Analysis:**
+### TNA and TSA Definitions:
+- **TNA** (Tropical North Atlantic): SST anomalies are calculated within the boundary 55°W - 15°W and 5°N - 25°N. For specifics, check [NOAA TNA Info](https://stateoftheocean.osmc.noaa.gov/sur/atl/tna.php).
+  
+- **TSA** (Tropical South Atlantic): SST anomalies pertain to the Gulf of Guinea in the eastern South Tropical Atlantic, defined by 30°W - 10°E and 20°S - 0°. More details available at [NOAA TSA Info](https://stateoftheocean.osmc.noaa.gov/sur/atl/tsa.php).
 
-- The code then analyzes the SST anomaly *variation* over a period of 7 days. It calculates the difference between the SST anomaly on the last day of the data and the SST anomaly 7 days prior.
-- `mean_variation_in_region` calculates the mean variation for TNA and TSA regions.
+### Mean SST Calculation:
+- The `mean_sst_in_region` function computes the mean SST anomaly for the designated regions by applying masks based on latitude and longitude.
 
-**6. Map Plotting:**
+## **4. Time Series Plotting**
 
-- The `plot_anomaly_variation` function creates a map visualizing the 7-day SST anomaly variation.
-- Uses `cartopy` to create a map with coastlines and oceans.
-- A colormap (blue to white to red) represents the magnitude and direction of the anomaly variation.
-- The TNA and TSA regions are highlighted with colored boxes. The average variations in these regions are shown with text labels on the plot.
-- Source and reference climatology are added.
+- The `plot_sst_difference` function visualizes the difference in mean SST anomalies between TNA and TSA.
+- It generates two plots:
+  - One for the last 30 days,
+  - Another covering the entire year available in the dataset.
+- The plots feature:
+  - Anomalies with respect to time,
+  - A reference line at zero for context,
+  - Legends and gridlines for clarity,
+  - Source and climatology information.
 
-**7. Main Execution Block:**
+## **5. Anomaly Variation Analysis**
 
-- The `if os.path.exists(file_path):` block checks if the downloaded file exists.
-- The core analysis (loading data, calculating anomalies, creating plots) happens inside this block.
-- Error handling is in place to print an error message if the file does not exist.
+- The code analyzes SST anomaly *variation* over a 7-day period, measuring the change between the SST anomaly on the final day of the data against the anomaly from 7 days prior.
+- The mean variation for TNA and TSA is computed using the `mean_variation_in_region`.
 
+## **6. Map Plotting**
 
+- The `plot_anomaly_variation` function employs `cartopy` for mapping the 7-day SST anomaly variation.
+- Features include:
+  - Coastline and ocean delineation,
+  - A colormap representing the magnitude and direction of the anomaly variation,
+  - Highlighted boxes for TNA and TSA regions with text labels for average values,
+  - Source and climatology references displayed.
 
-**In summary:** The code downloads NOAA SST anomaly data, calculates regional mean anomalies and their variations over time, and generates plots to visualize these trends. The visualizations include both time series and spatial maps, making the data analysis more comprehensive.
+## **7. Main Execution Block**
+
+- The block wraps the main execution logic, verifying the existence of the downloaded file with `if os.path.exists(file_path):`.
+- It encompasses the core analysis steps (data loading, mean calculation, plotting) and includes error handling to output a message if the file is missing.
+
+---
+
+## **Summary**
+This code enables users to download, analyze, and visualize NOAA SST anomaly data effectively. 
